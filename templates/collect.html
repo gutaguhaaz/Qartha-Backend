@@ -1,9 +1,10 @@
+
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Qartha · Registro de escaneo</title>
+  <title>Qartha · Scan Registration</title>
   <style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 0; padding: 2rem; }
     .card { max-width: 640px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; }
@@ -16,11 +17,11 @@
 </head>
 <body>
   <div class="card">
-    <h1>Escaneo de activo</h1>
-    <p>Estamos registrando tu ubicación (si autorizas) para auditoría y trazabilidad.</p>
-    <div id="status" class="status">Solicitando permiso de ubicación…</div>
+    <h1>Asset Scan</h1>
+    <p>We are recording your location (if authorized) for auditing and traceability purposes.</p>
+    <div id="status" class="status">Requesting location permission…</div>
     <div style="margin-top: 1rem;">
-      <button id="retry" style="display:none">Reintentar</button>
+      <button id="retry" style="display:none">Retry</button>
     </div>
   </div>
   <script>
@@ -29,7 +30,7 @@
     const $retry = document.getElementById('retry');
 
     function postScan(coords) {
-      $status.textContent = "Enviando datos…";
+      $status.textContent = "Sending data…";
       fetch("/api/scans", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -43,11 +44,11 @@
       .then(r => r.json())
       .then(() => {
         $status.className = "status ok";
-        $status.textContent = "¡Listo! El escaneo ha quedado registrado. Ya puedes cerrar esta página.";
+        $status.textContent = "Done! The scan has been recorded. You can now close this page.";
       })
       .catch(() => {
         $status.className = "status err";
-        $status.textContent = "No se pudo registrar el escaneo. Intenta de nuevo.";
+        $status.textContent = "Could not record the scan. Please try again.";
         $retry.style.display = "inline-block";
       });
     }
@@ -55,14 +56,14 @@
     function askGeo() {
       $retry.style.display = "none";
       if (!navigator.geolocation) {
-        $status.textContent = "Tu navegador no soporta geolocalización. Registraremos el escaneo sin ubicación.";
+        $status.textContent = "Your browser does not support geolocation. We will record the scan without location.";
         postScan(null);
         return;
       }
       navigator.geolocation.getCurrentPosition(
         (pos) => postScan(pos.coords),
         (err) => {
-          $status.textContent = "Ubicación denegada o no disponible. Registraremos el escaneo sin ubicación.";
+          $status.textContent = "Location denied or unavailable. We will record the scan without location.";
           postScan(null);
         },
         { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
