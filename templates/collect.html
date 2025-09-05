@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Qartha · Registro de escaneo</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 0; padding: 2rem; }
+    .card { max-width: 640px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; }
+    h1 { font-size: 1.25rem; margin: 0 0 .5rem; }
+    .status { margin-top: .75rem; padding: .75rem; border-radius: 8px; background: #f3f4f6; }
+    .ok { background: #ecfdf5; }
+    .err { background: #fef2f2; }
+    button { padding: .75rem 1rem; border: 0; border-radius: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Escaneo de activo</h1>
+    <p>Estamos registrando tu ubicación (si autorizas) para auditoría y trazabilidad.</p>
+    <div id="status" class="status">Solicitando permiso de ubicación…</div>
+    <div style="margin-top: 1rem;">
+      <button id="retry" style="display:none">Reintentar</button>
+    </div>
+  </div>
+  <script>
+    const deviceId = "{{ device_id }}";
+    const $status = document.getElementById('status');
+    const $retry = document.getElementById('retry');
+
+    function postScan(coords) {
+      $status.textContent = "Enviando datos…";
+      fetch("/api/scans", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          device_id: deviceId,
+          lat: coords?.latitude ?? null,
+          lng: coords?.longitude ?? null,
+          accuracy: coords?.accuracy ?? null
+        })
+      })
+      .then(r => r.json())
+      .then(() => {
+        $status.className = "status ok";
+        $status.textContent = "¡Listo! El escaneo ha quedado registrado. Ya puedes cerrar esta página.";
+      })
+      .catch(() => {
+        $status.className = "status err";
+        $status.textContent = "No se pudo registrar el escaneo. Intenta de nuevo.";
+        $retry.style.display = "inline-block";
+      });
+    }
+
+    function askGeo() {
+      $retry.style.display = "none";
+      if (!navigator.geolocation) {
+        $status.textContent = "Tu navegador no soporta geolocalización. Registraremos el escaneo sin ubicación.";
+        postScan(null);
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => postScan(pos.coords),
+        (err) => {
+          $status.textContent = "Ubicación denegada o no disponible. Registraremos el escaneo sin ubicación.";
+          postScan(null);
+        },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+      );
+    }
+
+    $retry.addEventListener('click', askGeo);
+    askGeo();
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+run = "uvicorn app.main:app --host 0.0.0.0 --port=8000 --reload"
+
+[env]
+# Fill these in Replit > Secrets
+# MONGO_URL_ATLAS="mongodb+srv://<user>:<pass>@<cluster>/<db>?retryWrites=true&w=majority"
+# DATABASE_NAME="qartha"
+# BACKEND_BASE_URL="https://<your-repl-name>.replit.dev"  # or your custom domain
+# N8N_WEBHOOK_URL="https://n8n.example.com/webhook/<id>"
+# QRTIGER_API_KEY="<your key>"
