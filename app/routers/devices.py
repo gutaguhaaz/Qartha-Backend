@@ -17,13 +17,18 @@ def _to_out(d: dict) -> DeviceOut:
 
 @router.post("", response_model=DeviceOut)
 async def create_device(payload: DeviceIn):
-    db = get_db()
-    doc = payload.model_dump()
-    now = datetime.utcnow()
-    doc.update({"created_at": now, "updated_at": now, "qr_url": None, "qr_image_url": None})
-    res = await db.devices.insert_one(doc)
-    saved = await db.devices.find_one({"_id": res.inserted_id})
-    return _to_out(saved)
+    try:
+        db = get_db()
+        doc = payload.model_dump()
+        now = datetime.utcnow()
+        doc.update({"created_at": now, "updated_at": now, "qr_url": None, "qr_image_url": None})
+        res = await db.devices.insert_one(doc)
+        saved = await db.devices.find_one({"_id": res.inserted_id})
+        return _to_out(saved)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @router.get("/{device_id}", response_model=DeviceOut)
 async def get_device(device_id: str):
