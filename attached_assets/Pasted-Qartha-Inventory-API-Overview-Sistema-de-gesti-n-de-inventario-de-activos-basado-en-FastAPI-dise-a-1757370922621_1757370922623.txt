@@ -1,0 +1,60 @@
+Qartha Inventory API
+Overview Sistema de gestión de inventario de activos basado en FastAPI, diseñado para funcionar como un Content Management System (CMS). Utiliza códigos QR dinámicos para la gestión de equipos de red y el registro de escaneos para auditoría. La arquitectura es flexible para crecer desde un solo sitio a múltiples ubicaciones.
+
+Project Architecture
+Framework: FastAPI (versión 0.115.2)
+Database: MongoDB Atlas (a través del driver asíncrono Motor)
+Server: Uvicorn con auto-reload
+Templating: Jinja2 para las páginas HTML de colección
+QR Integration: QR Tiger API (implementación real con fallback)
+HTTP Client: httpx para llamadas a APIs externas
+Port: 5000 (obligatorio para el proxy de Replit)
+
+Implemented Features ✅
+Gestión de Dispositivos (CMS):
+Device Management: API completa (CRUD) para la gestión de dispositivos.
+Content Management: Modelos de datos y endpoints para adjuntar imágenes, diagramas y tablas a cada dispositivo.
+Generación de Códigos QR:
+Real Integration: Integración con la API de QR Tiger, con un robusto mecanismo de fallback que genera un URL local en caso de problemas de conectividad de red.
+Seguimiento y Registro:
+Geolocation Tracking: Páginas HTML con JavaScript para capturar la geolocalización. La geolocalización en los dispositivos es opcional para simplificar la implementación inicial.
+Scan Recording: Endpoint POST para registrar cada escaneo con información de IP y User-Agent.
+Configuración y Despliegue:
+CORS Configuration: Soporte para solicitudes de origen cruzado.
+Error Handling: Sistema de fallback robusto para la generación de QR y manejo de errores.
+Health Checks: Endpoints de estado y salud.
+
+Backend API Status
+Core Endpoints (✅ Implemented)
+GET /: Verificación del estado de la API.
+GET /health: Endpoint de chequeo de salud.
+POST /api/devices: Crear un nuevo dispositivo.
+GET /api/devices/{id}: Obtener los detalles de un dispositivo.
+PUT /api/devices/{id}: Actualizar la información de un dispositivo.
+POST /api/devices/{id}/qr: Generar QR con integración de QR Tiger.
+GET /collect/{device_id}: Página HTML para la recolección de activos.
+POST /api/scans: Registrar un escaneo de ubicación.
+GET /api/scans?device_id=...: Listar los escaneos de un dispositivo.
+POST /api/files: Cargar archivos (imágenes, PDFs) y adjuntarlos a un dispositivo.
+GET /api/files/{file_id}: Servir un archivo subido.
+POST /api/auth/login: Autenticación de usuarios administradores.
+POST /api/auth/register: Registro de nuevos usuarios.
+
+What's Missing / Next Steps 📋
+Frontend Integration:
+Desarrollar un frontend en Angular/React para la gestión de dispositivos.
+Crear una UI para subir archivos y asociarlos a los dispositivos.
+Diseñar el dashboard de inventario y la visualización del historial de escaneos.
+Enhanced Features:
+Funcionalidad de importación/exportación de dispositivos en lote.
+Analíticas avanzadas de escaneos.
+Auditoría de cambios y gestión de usuarios más detallada.
+Production Readiness:
+Implementar limitación de tasa (rate limiting).
+Mejorar la validación de solicitudes.
+Configurar un sistema de logging y monitoreo.
+Generar documentación de la API con Swagger.
+
+
+
+Esto sería un demo funcional listo para mostrar la idea de inventario inteligente con QR físicos y notificaciones.
