@@ -1,7 +1,7 @@
 
 # Qartha Inventory API - Backend Documentation
 
-Sistema de gestión de inventario de activos basado en FastAPI con códigos QR dinámicos y captura de geolocalización.
+Sistema de gestión de inventario de activos basado en FastAPI con códigos QR dinámicos, captura de geolocalización y gestión de archivos.
 
 ## 🚀 Quick Start (Replit)
 
@@ -16,6 +16,9 @@ Sistema de gestión de inventario de activos basado en FastAPI con códigos QR d
 
 ## 📋 API Endpoints
 
+### Base URL
+Usar la URL base: `https://tu-repl.replit.dev`
+
 ### 🏥 Health Check
 ```http
 GET /health
@@ -25,6 +28,61 @@ GET /health
 {
   "status": "ok"
 }
+```
+
+### 🔐 Autenticación
+
+#### Registrar Usuario
+```http
+POST /api/auth/register
+Content-Type: application/json
+```
+**Request Body:**
+```json
+{
+  "username": "usuario123",
+  "password": "contraseñaSegura",
+  "email": "usuario@email.com"
+}
+```
+**Response (200):**
+```json
+{
+  "id": "64a7b8c9d0e1f2a3b4c5d6e7",
+  "username": "usuario123",
+  "email": "usuario@email.com"
+}
+```
+
+#### Iniciar Sesión
+```http
+POST /api/auth/login
+Content-Type: application/json
+```
+**Request Body:**
+```json
+{
+  "username": "usuario123",
+  "password": "contraseñaSegura"
+}
+```
+**Response (200):**
+```json
+{
+  "access_token": "token_generado_aqui",
+  "token_type": "bearer",
+  "user": {
+    "id": "64a7b8c9d0e1f2a3b4c5d6e7",
+    "username": "usuario123",
+    "email": "usuario@email.com"
+  }
+}
+```
+
+#### Usar Token de Autenticación
+Para endpoints protegidos, incluir en headers:
+```http
+Authorization: Bearer token_generado_aqui
 ```
 
 ### 📱 Gestión de Dispositivos
@@ -37,52 +95,52 @@ Content-Type: application/json
 **Request Body:**
 ```json
 {
-  "name": "Router Cisco 2960",
+  "name": "Router Principal",
   "category": "Network",
   "brand": "Cisco",
-  "model": "2960-X",
-  "serial": "ABC123456",
-  "mac": "00:11:22:33:44:55",
-  "site": "Oficina Principal",
-  "room": "Data Center",
-  "rack": "R1-U24",
+  "model": "RV340W",
+  "serial": "ABC123456789",
+  "mac": "AA:BB:CC:DD:EE:FF",
+  "site": "Oficina Central",
+  "room": "Sala de Servidores",
+  "rack": "Rack-01",
   "lat": -12.0464,
   "lng": -77.0428,
   "notes": "Router principal de la red",
-  "description": "Router de acceso para la red LAN",
+  "description": "Descripción detallada del dispositivo",
   "specifications": {
-    "ports": 48,
-    "speed": "1Gbps",
-    "poe": true
+    "cpu": "Dual-core 1.2GHz",
+    "memory": "1GB RAM",
+    "storage": "256MB Flash"
   },
-  "maintenance_notes": "Mantenimiento cada 6 meses",
-  "tags": ["critical", "network", "production"]
+  "maintenance_notes": "Último mantenimiento: 15/01/2024",
+  "tags": ["networking", "critical", "vpn"]
 }
 ```
-**Response (201):**
+**Response (200):**
 ```json
 {
   "id": "64a7b8c9d0e1f2a3b4c5d6e7",
-  "name": "Router Cisco 2960",
+  "name": "Router Principal",
   "category": "Network",
   "brand": "Cisco",
-  "model": "2960-X",
-  "serial": "ABC123456",
-  "mac": "00:11:22:33:44:55",
-  "site": "Oficina Principal",
-  "room": "Data Center",
-  "rack": "R1-U24",
+  "model": "RV340W",
+  "serial": "ABC123456789",
+  "mac": "AA:BB:CC:DD:EE:FF",
+  "site": "Oficina Central",
+  "room": "Sala de Servidores",
+  "rack": "Rack-01",
   "lat": -12.0464,
   "lng": -77.0428,
   "notes": "Router principal de la red",
-  "description": "Router de acceso para la red LAN",
+  "description": "Descripción detallada del dispositivo",
   "specifications": {
-    "ports": 48,
-    "speed": "1Gbps",
-    "poe": true
+    "cpu": "Dual-core 1.2GHz",
+    "memory": "1GB RAM",
+    "storage": "256MB Flash"
   },
-  "maintenance_notes": "Mantenimiento cada 6 meses",
-  "tags": ["critical", "network", "production"],
+  "maintenance_notes": "Último mantenimiento: 15/01/2024",
+  "tags": ["networking", "critical", "vpn"],
   "qr_url": null,
   "qr_image_url": null,
   "files": null,
@@ -91,7 +149,7 @@ Content-Type: application/json
 }
 ```
 
-#### Obtener Dispositivo
+#### Obtener Dispositivo por ID
 ```http
 GET /api/devices/{device_id}
 ```
@@ -107,11 +165,11 @@ Content-Type: application/json
 
 #### Listar Dispositivos
 ```http
-GET /api/devices?skip=0&limit=50&category=Network&site=Oficina Principal
+GET /api/devices?skip=0&limit=50&category=Network&site=Oficina Central
 ```
 **Query Parameters:**
-- `skip`: Número de registros a omitir (default: 0)
-- `limit`: Máximo de registros (1-100, default: 50)
+- `skip`: Número de registros a saltar (default: 0)
+- `limit`: Máximo de registros (default: 50, máx: 100)
 - `category`: Filtrar por categoría (opcional)
 - `site`: Filtrar por sitio (opcional)
 
@@ -120,13 +178,13 @@ GET /api/devices?skip=0&limit=50&category=Network&site=Oficina Principal
 [
   {
     "id": "64a7b8c9d0e1f2a3b4c5d6e7",
-    "name": "Router Cisco 2960",
+    "name": "Router Principal",
     // ... resto de campos del dispositivo
   }
 ]
 ```
 
-#### Generar Código QR
+#### Generar Código QR para Dispositivo
 ```http
 POST /api/devices/{device_id}/qr
 ```
@@ -134,10 +192,10 @@ POST /api/devices/{device_id}/qr
 ```json
 {
   "id": "64a7b8c9d0e1f2a3b4c5d6e7",
-  "name": "Router Cisco 2960",
-  "qr_url": "https://qrcode-tiger.com/qr/ABC123",
-  "qr_image_url": "https://qrcode-tiger.com/qr/ABC123.png",
-  // ... resto de campos
+  "name": "Router Principal",
+  "qr_url": "https://api.qrcode-tiger.com/qr/dynamic/abc123",
+  "qr_image_url": "https://api.qrcode-tiger.com/qr/dynamic/abc123.png",
+  // ... resto de campos del dispositivo
 }
 ```
 
@@ -220,124 +278,156 @@ Content-Type: multipart/form-data
 ```http
 GET /api/files/{file_id}
 ```
-**Response:** Archivo binario con headers apropiados
-
-### 🔐 Autenticación
-
-#### Registrar Usuario
-```http
-POST /api/auth/register
-Content-Type: application/json
+**Response:** Archivo binario con headers:
 ```
-**Request Body:**
-```json
-{
-  "username": "admin",
-  "password": "mi_password_seguro",
-  "email": "admin@empresa.com"
-}
-```
-**Response (200):**
-```json
-{
-  "id": "64a7b8c9d0e1f2a3b4c5d6ea",
-  "username": "admin",
-  "email": "admin@empresa.com"
-}
+Content-Type: application/pdf (según tipo de archivo)
+Content-Disposition: attachment; filename=manual_router.pdf
 ```
 
-#### Iniciar Sesión
-```http
-POST /api/auth/login
-Content-Type: application/json
-```
-**Request Body:**
-```json
-{
-  "username": "admin",
-  "password": "mi_password_seguro"
-}
-```
-**Response (200):**
-```json
-{
-  "access_token": "abc123def456...",
-  "token_type": "bearer",
-  "user": {
-    "id": "64a7b8c9d0e1f2a3b4c5d6ea",
-    "username": "admin",
-    "email": "admin@empresa.com"
+## 🔄 Flujo de Trabajo para Frontend
+
+### 1. Autenticación
+```javascript
+// Registrar usuario
+const registerUser = async (userData) => {
+  const response = await fetch('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData)
+  });
+  return await response.json();
+};
+
+// Iniciar sesión
+const loginUser = async (credentials) => {
+  const response = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials)
+  });
+  const data = await response.json();
+  
+  // Guardar token en localStorage
+  if (data.access_token) {
+    localStorage.setItem('token', data.access_token);
   }
-}
+  return data;
+};
+
+// Headers con autenticación
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': token ? `Bearer ${token}` : ''
+  };
+};
 ```
 
-#### Usar Token de Autenticación
-```http
-Authorization: Bearer abc123def456...
+### 2. Gestión de Dispositivos
+```javascript
+// Listar dispositivos con filtros
+const getDevices = async (filters = {}) => {
+  const params = new URLSearchParams({
+    skip: filters.skip || 0,
+    limit: filters.limit || 50,
+    ...(filters.category && { category: filters.category }),
+    ...(filters.site && { site: filters.site })
+  });
+  
+  const response = await fetch(`/api/devices?${params}`, {
+    headers: getAuthHeaders()
+  });
+  return await response.json();
+};
+
+// Crear dispositivo
+const createDevice = async (deviceData) => {
+  const response = await fetch('/api/devices', {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(deviceData)
+  });
+  return await response.json();
+};
+
+// Actualizar dispositivo
+const updateDevice = async (deviceId, deviceData) => {
+  const response = await fetch(`/api/devices/${deviceId}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(deviceData)
+  });
+  return await response.json();
+};
+
+// Generar QR
+const generateQR = async (deviceId) => {
+  const response = await fetch(`/api/devices/${deviceId}/qr`, {
+    method: 'POST',
+    headers: getAuthHeaders()
+  });
+  const updated = await response.json();
+  // updated.qr_image_url contiene la URL de la imagen del QR
+  return updated;
+};
 ```
 
-### 🌐 Páginas Web
+### 3. Gestión de Archivos
+```javascript
+// Subir archivo
+const uploadFile = async (file, deviceId = null) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  if (deviceId) {
+    formData.append('device_id', deviceId);
+  }
+  
+  const token = localStorage.getItem('token');
+  const response = await fetch('/api/files', {
+    method: 'POST',
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : ''
+      // No incluir Content-Type para multipart/form-data
+    },
+    body: formData
+  });
+  return await response.json();
+};
 
-#### Página de Colección (QR Scanner)
-```http
-GET /collect/{device_id}
+// Descargar archivo
+const downloadFile = async (fileId) => {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`/api/files/${fileId}`, {
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : ''
+    }
+  });
+  
+  if (response.ok) {
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = response.headers.get('Content-Disposition')
+      ?.split('filename=')[1] || 'file';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+};
 ```
-Página HTML que:
-- Solicita permisos de geolocalización
-- Captura coordenadas GPS
-- Envía automáticamente un escaneo via POST a `/api/scans`
-- Muestra información del dispositivo
 
-## 🔄 Flujo de Trabajo Típico
-
-### Para el Frontend (Angular/React/Vue):
-
-1. **Listar Dispositivos:**
-   ```javascript
-   const response = await fetch('/api/devices?limit=50');
-   const devices = await response.json();
-   ```
-
-2. **Crear Dispositivo:**
-   ```javascript
-   const device = {
-     name: "Router Principal",
-     category: "Network",
-     // ... otros campos
-   };
-   const response = await fetch('/api/devices', {
-     method: 'POST',
-     headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify(device)
-   });
-   ```
-
-3. **Generar QR:**
-   ```javascript
-   const response = await fetch(`/api/devices/${deviceId}/qr`, {
-     method: 'POST'
-   });
-   const updated = await response.json();
-   // updated.qr_image_url contiene la imagen del QR
-   ```
-
-4. **Subir Archivo:**
-   ```javascript
-   const formData = new FormData();
-   formData.append('file', fileInput.files[0]);
-   formData.append('device_id', deviceId);
-   
-   const response = await fetch('/api/files', {
-     method: 'POST',
-     body: formData
-   });
-   ```
-
-5. **Ver Historial de Escaneos:**
-   ```javascript
-   const response = await fetch(`/api/scans?device_id=${deviceId}&limit=20`);
-   const scans = await response.json();
-   ```
+### 4. Historial de Escaneos
+```javascript
+// Ver escaneos de un dispositivo
+const getDeviceScans = async (deviceId, limit = 20) => {
+  const response = await fetch(
+    `/api/scans?device_id=${deviceId}&limit=${limit}`,
+    { headers: getAuthHeaders() }
+  );
+  return await response.json();
+};
+```
 
 ## 🛠️ Configuración de Desarrollo
 
@@ -345,9 +435,7 @@ Página HTML que:
 La API está configurada para permitir solicitudes desde:
 - `https://tu-repl.replit.dev`
 - `http://localhost:4200` (Angular dev)
-
-### Base URL
-Usar la URL base: `https://tu-repl.replit.dev`
+- `http://localhost:3000` (React dev)
 
 ### Manejo de Errores
 La API devuelve errores en formato estándar:
@@ -357,24 +445,15 @@ La API devuelve errores en formato estándar:
 }
 ```
 
-Códigos de estado comunes:
+**Códigos de estado comunes:**
 - `200`: Éxito
 - `201`: Creado
 - `400`: Error de validación
 - `401`: No autorizado
 - `404`: No encontrado
-- `413`: Archivo muy grande
+- `413`: Archivo muy grande (>10MB)
+- `422`: Error de validación de datos
 - `500`: Error del servidor
-
-## 🔧 Características Técnicas
-
-- **Framework:** FastAPI 0.115.2
-- **Base de Datos:** MongoDB (Motor driver)
-- **Servidor:** Uvicorn en puerto 5000
-- **Plantillas:** Jinja2
-- **Subida de Archivos:** FastAPI UploadFile (máximo 10MB)
-- **QR Codes:** Integración con QR Tiger API
-- **Autenticación:** Token-based (Bearer)
 
 ## 📱 Integración QR
 
@@ -386,6 +465,94 @@ https://tu-repl.replit.dev/collect/{device_id}
 Esta página automáticamente:
 1. Solicita geolocalización al usuario
 2. Registra el escaneo en `/api/scans`
-3. Envía notificación (si está configurada)
+3. Envía notificaciones (si está configurado)
 
-¡Perfecto para integrar con cualquier frontend moderno! 🚀
+## 🔧 Características Técnicas
+
+- **Framework:** FastAPI 0.115.2
+- **Base de Datos:** MongoDB (Motor driver async)
+- **Servidor:** Uvicorn en puerto 5000
+- **Plantillas:** Jinja2 para páginas de colección
+- **Subida de Archivos:** FastAPI UploadFile (máximo 10MB)
+- **QR Codes:** Integración con QR Tiger API + fallback
+- **Autenticación:** Token-based (Bearer) con PBKDF2 hashing
+- **CORS:** Configurado para desarrollo local y producción
+
+## 🚨 Notas de Seguridad
+
+1. **Tokens:** Los tokens expiran en 7 días
+2. **Passwords:** Hash PBKDF2 con salt aleatorio
+3. **Files:** Validación de tamaño (10MB máx) y sanitización de nombres
+4. **CORS:** Configurado solo para orígenes permitidos
+5. **Database:** Validación de ObjectIds para prevenir inyección
+
+## 📊 Estructura de Datos
+
+### Device Model
+```typescript
+interface Device {
+  id: string;
+  name: string;
+  category?: string;
+  brand?: string;
+  model?: string;
+  serial?: string;
+  mac?: string;
+  site?: string;
+  room?: string;
+  rack?: string;
+  lat?: number;
+  lng?: number;
+  notes?: string;
+  description?: string;
+  specifications?: Record<string, any>;
+  maintenance_notes?: string;
+  tags?: string[];
+  qr_url?: string;
+  qr_image_url?: string;
+  files?: string[];
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### Scan Model
+```typescript
+interface Scan {
+  id: string;
+  device_id: string;
+  lat?: number;
+  lng?: number;
+  accuracy?: number;
+  ip?: string;
+  user_agent?: string;
+  created_at: string;
+}
+```
+
+### File Model
+```typescript
+interface FileResponse {
+  id: string;
+  filename: string;
+  size: number;
+  content_type: string;
+}
+```
+
+### User Model
+```typescript
+interface User {
+  id: string;
+  username: string;
+  email: string;
+}
+
+interface AuthResponse {
+  access_token: string;
+  token_type: string;
+  user: User;
+}
+```
+
+¡El backend está listo para integrarse con cualquier frontend! 🚀
