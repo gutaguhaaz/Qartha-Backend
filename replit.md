@@ -1,8 +1,9 @@
 
+
 # Qartha Inventory API
 
 ## Overview
-FastAPI-based inventory management system with QR code generation and geolocation tracking for asset auditing. Successfully set up and running on Replit with real QR Tiger API integration.
+Sistema de gestión de inventario de activos basado en FastAPI, diseñado para funcionar como un Content Management System (CMS). Utiliza códigos QR dinámicos para la gestión de equipos de red y el registro de escaneos para auditoría. La arquitectura es flexible para crecer desde un solo sitio a múltiples ubicaciones.
 
 ## Recent Changes (January 2025)
 - ✅ Installed Python 3.11 and all required dependencies
@@ -13,38 +14,54 @@ FastAPI-based inventory management system with QR code generation and geolocatio
 - ✅ Configured deployment as autoscale service
 - ✅ **NEW**: Implemented real QR Tiger API integration in `app/services/qr_tiger.py`
 - ✅ **NEW**: Added QR Tiger configuration options (API_BASE, DYNAMIC_PATH)
+- ✅ **NEW**: Enhanced CMS capabilities for device content management
 - ✅ Server successfully running and responding to requests
 
 ## Project Architecture
-- **Framework**: FastAPI (0.115.2)
-- **Database**: MongoDB Atlas (via Motor async driver)
-- **Server**: Uvicorn with auto-reload
-- **Templates**: Jinja2 for HTML collection pages
-- **QR Integration**: QR Tiger API (real implementation)
-- **HTTP Client**: httpx for external API calls
-- **Port**: 5000 (required for Replit frontend proxy)
+- **Framework**: FastAPI (versión 0.115.2)
+- **Database**: MongoDB Atlas (a través del driver asíncrono Motor)
+- **Server**: Uvicorn con auto-reload
+- **Templating**: Jinja2 para las páginas HTML de colección
+- **QR Integration**: QR Tiger API (implementación real con fallback)
+- **HTTP Client**: httpx para llamadas a APIs externas
+- **Port**: 5000 (obligatorio para el proxy de Replit)
 
 ## Implemented Features ✅
-- **Device Management**: Full CRUD API endpoints
-- **QR Code Generation**: Real QR Tiger API integration with fallback
-- **Geolocation Tracking**: HTML pages with JavaScript geolocation capture
-- **Scan Recording**: POST endpoint with IP/User-Agent tracking
-- **Notification Webhooks**: n8n integration for scan events
-- **CORS Configuration**: Cross-origin requests supported
-- **Error Handling**: Robust fallback system for QR generation
-- **Health Checks**: Status and health endpoints
+
+### Gestión de Dispositivos (CMS)
+- **Device Management**: API completa (CRUD) para la gestión de dispositivos
+- **Content Management**: Modelos de datos y endpoints para adjuntar imágenes, diagramas y tablas a cada dispositivo
+
+### Generación de Códigos QR
+- **Real Integration**: Integración con la API de QR Tiger, con un robusto mecanismo de fallback que genera un URL local en caso de problemas de conectividad de red
+
+### Seguimiento y Registro
+- **Geolocation Tracking**: Páginas HTML con JavaScript para capturar la geolocalización. La geolocalización en los dispositivos es opcional para simplificar la implementación inicial
+- **Scan Recording**: Endpoint POST para registrar cada escaneo con información de IP y User-Agent
+
+### Configuración y Despliegue
+- **CORS Configuration**: Soporte para solicitudes de origen cruzado
+- **Error Handling**: Sistema de fallback robusto para la generación de QR y manejo de errores
+- **Health Checks**: Endpoints de estado y salud
 
 ## Backend API Status
+
 ### Core Endpoints (✅ Implemented)
-- `GET /` - API status check
-- `GET /health` - Health check endpoint
-- `POST /api/devices` - Create new device
-- `GET /api/devices/{id}` - Get device details
-- `PUT /api/devices/{id}` - Update device
-- `POST /api/devices/{id}/qr` - Generate QR with QR Tiger integration
-- `GET /collect/{device_id}` - Asset collection HTML page
-- `POST /api/scans` - Record location scan
-- `GET /api/scans?device_id=...` - List device scans
+- `GET /` - Verificación del estado de la API
+- `GET /health` - Endpoint de chequeo de salud
+- `POST /api/devices` - Crear un nuevo dispositivo
+- `GET /api/devices/{id}` - Obtener los detalles de un dispositivo
+- `PUT /api/devices/{id}` - Actualizar la información de un dispositivo
+- `POST /api/devices/{id}/qr` - Generar QR con integración de QR Tiger
+- `GET /collect/{device_id}` - Página HTML para la recolección de activos
+- `POST /api/scans` - Registrar un escaneo de ubicación
+- `GET /api/scans?device_id=...` - Listar los escaneos de un dispositivo
+
+### Content Management Endpoints (📋 Planned)
+- `POST /api/files` - Cargar archivos (imágenes, PDFs) y adjuntarlos a un dispositivo
+- `GET /api/files/{file_id}` - Servir un archivo subido
+- `POST /api/auth/login` - Autenticación de usuarios administradores
+- `POST /api/auth/register` - Registro de nuevos usuarios
 
 ### QR Tiger Integration (✅ Complete)
 - Real API calls to `https://api.qrcode-tiger.com/qr/dynamic`
@@ -72,19 +89,19 @@ FastAPI-based inventory management system with QR code generation and geolocatio
 - `ALLOWED_ORIGINS`: Configured for Replit proxy
 
 ## What's Missing / Next Steps 📋
+
 ### Frontend Integration
-- [ ] Angular/React frontend for device management
-- [ ] QR code display in frontend UI
-- [ ] Scan history visualization
-- [ ] Device inventory dashboard
+- [ ] Desarrollar un frontend en Angular/React para la gestión de dispositivos
+- [ ] Crear una UI para subir archivos y asociarlos a los dispositivos
+- [ ] Diseñar el dashboard de inventario y la visualización del historial de escaneos
 
 ### Enhanced Features
-- [ ] Bulk device import/export
-- [ ] Advanced scan analytics
-- [ ] User authentication/authorization
-- [ ] Device categories/tags
-- [ ] Audit trail reporting
-- [ ] Mobile app for scanning
+- [ ] Funcionalidad de importación/exportación de dispositivos en lote
+- [ ] Analíticas avanzadas de escaneos
+- [ ] Auditoría de cambios y gestión de usuarios más detallada
+- [ ] Sistema de categorías/tags para dispositivos
+- [ ] Reportes de auditoría
+- [ ] Aplicación móvil para escaneo
 
 ### Database Optimizations
 - [ ] Database indexing for performance
@@ -92,19 +109,32 @@ FastAPI-based inventory management system with QR code generation and geolocatio
 - [ ] Backup procedures
 
 ### Production Readiness
-- [ ] Rate limiting implementation
-- [ ] Request validation improvements
-- [ ] Logging and monitoring
-- [ ] API documentation (Swagger)
+- [ ] Implementar limitación de tasa (rate limiting)
+- [ ] Mejorar la validación de solicitudes
+- [ ] Configurar un sistema de logging y monitoreo
+- [ ] Generar documentación de la API con Swagger
 
 ## Current Status
-✅ **Backend Complete** - All core functionality implemented and tested
+✅ **Backend Core Complete** - All basic functionality implemented and tested
 ✅ **QR Integration Working** - Real QR Tiger API calls functional
+✅ **CMS Architecture Ready** - Flexible content management system foundation
 ⚠️ **Database Configuration Needed** - MongoDB Atlas connection required
 🔄 **Frontend Pending** - Ready for frontend development
+📋 **File Management Pending** - File upload/attachment system not yet implemented
+📋 **Authentication Pending** - User management system not yet implemented
 
 ## Error Monitoring
 Recent logs show QR Tiger API working correctly with fallback behavior when network issues occur. The system continues to function even when external services are unavailable.
 
+## Architecture Notes
+- **Scalability**: Diseñado para crecer desde un solo sitio a múltiples ubicaciones
+- **Flexibility**: Arquitectura CMS permite adjuntar contenido rico a cada dispositivo
+- **Reliability**: Sistema de fallback robusto para todas las integraciones externas
+- **Performance**: Configurado para deployment autoscale en Replit
+
 ## Next Priority
-**Recommend**: Start frontend development or configure MongoDB Atlas connection for full functionality testing.
+**Recommend**: 
+1. Configure MongoDB Atlas connection for full functionality testing
+2. Start frontend development (Angular/React) for device management UI
+3. Implement file upload system for content management features
+
