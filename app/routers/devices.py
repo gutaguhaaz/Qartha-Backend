@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends, Query
 from bson import ObjectId
 from datetime import datetime
 from typing import List, Optional
@@ -85,3 +85,27 @@ async def generate_qr_for_device(device_id: str):
     await db.devices.update_one({"_id": obj_id}, {"$set": update})
     doc = await db.devices.find_one({"_id": obj_id})
     return _to_out(doc)
+
+@router.get("/api/devices", response_model=List[DeviceOut])
+async def list_devices(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
+    category: Optional[str] = Query(None),
+    site: Optional[str] = Query(None),
+    db = Depends(get_db)
+):
+    """List all devices with optional filtering"""
+    filter_query = {}
+    if category:
+        filter_query["category"] = category
+    if site:
+        filter_query["site"] = site
+
+    cursor = db.devices.find(filter_query).skip(skip).limit(limit).sort("created_at", -1)
+    devices = []
+
+    async for device in cursor:
+        device["id"] = str(device["_id"])
+        devices.append(DeviceOut(**device))
+
+    return devices

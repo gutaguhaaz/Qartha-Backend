@@ -15,12 +15,18 @@ class DeviceIn(BaseModel):
     lat: Optional[float] = None
     lng: Optional[float] = None
     notes: Optional[str] = None
+    # Content Management fields
+    description: Optional[str] = None
+    specifications: Optional[Dict[str, Any]] = None
+    maintenance_notes: Optional[str] = None
+    tags: Optional[List[str]] = None
 
 class DeviceOut(DeviceIn):
     model_config = ConfigDict(from_attributes=True)
     id: str = Field(..., description="Device identifier (Mongo ObjectId as string)")
     qr_url: Optional[str] = None
     qr_image_url: Optional[str] = None
+    files: Optional[List[str]] = None  # File IDs
     created_at: datetime
     updated_at: datetime
 

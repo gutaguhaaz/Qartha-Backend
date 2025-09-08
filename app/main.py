@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .config import settings
-from .routers import health, devices, scans
+from .routers import health, devices, scans, files, auth
 
 app = FastAPI(title="Qartha Inventory API", version="0.1.0")
 
@@ -26,6 +26,8 @@ templates = Jinja2Templates(directory="templates")
 app.include_router(health.router)
 app.include_router(devices.router)
 app.include_router(scans.router)
+app.include_router(files.router)
+app.include_router(auth.router)
 
 @app.get("/collect/{device_id}", response_class=HTMLResponse)
 async def collect_page(request: Request, device_id: str):
