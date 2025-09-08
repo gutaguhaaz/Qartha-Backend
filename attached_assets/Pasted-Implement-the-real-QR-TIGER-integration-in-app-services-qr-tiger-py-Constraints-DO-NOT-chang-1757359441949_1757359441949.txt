@@ -1,0 +1,39 @@
+Implement the real QR TIGER integration in app/services/qr_tiger.py.
+
+Constraints:
+- DO NOT change routers, models, DB schema, or endpoints. Only edit app/services/qr_tiger.py.
+- Keep the existing function signature:
+    async def create_dynamic_url_qr(target_url: str, title: str | None = None) -> dict
+- Read API key from settings.QRTIGER_API_KEY (already wired via Secrets).
+- Add optional settings: QRTIGER_API_BASE (default "https://api.qrcode-tiger.com") and QRTIGER_DYNAMIC_PATH (default "/qr/dynamic").
+- Use httpx.AsyncClient with a 20s timeout and raise_for_status().
+- Request: POST {QRTIGER_API_BASE}{QRTIGER_DYNAMIC_PATH}
+  Headers:
+    Authorization: Bearer {settings.QRTIGER_API_KEY}
+    Content-Type: application/json
+  JSON body (minimal for URL dynamic QR):
+    {
+      "url": target_url,
+      "title": title (if provided),
+      "qrOptions": { "colorDark": "#000000", "colorLight": "#FFFFFF" }
+    }
+- Parse response and return this dict (exact keys expected by the app):
+    {
+      "qr_url":  <short/dynamic URL from QR TIGER, fallback to target_url>,
+      "qr_image_url": <image URL if provided, else None>
+    }
+  Accept common field names like "shortUrl", "url", "qrcode", "qrImage", "imageUrl".
+- Fallback behavior:
+  - If QRTIGER_API_KEY is missing -> return {"qr_url": target_url, "qr_image_url": None}.
+  - If HTTP error or unexpected schema -> log the error (print) and return {"qr_url": target_url, "qr_image_url": None} (do NOT raise; endpoint must keep working).
+- Add minimal unit-like self-test in a guarded __main__ block (optional) that won't run in production.
+
+Also:
+- Add QRTIGER_API_BASE and QRTIGER_DYNAMIC_PATH to app/config.py Settings with sane defaults, reading from env.
+- Ensure requirements already include httpx; do not add heavy deps.
+- Do not change /api/devices/{id}/qr endpoint or its response_model.
+
+Acceptance checks (I will run with Postman):
+1) POST /api/devices -> get id.
+2) POST /api/devices/{id}/qr -> response includes qr_url != collector when key is set, and qr_image_url if provided by API.
+3) Opening qr_url should redirect to /collect/{id} (handled by QR TIGER).
