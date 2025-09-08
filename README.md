@@ -9,7 +9,6 @@ Sistema de gestión de inventario de activos basado en FastAPI con códigos QR d
 2. Configura las **Secrets** en el panel de Replit:
    - `MONGO_URL_ATLAS`: Tu URI de MongoDB Atlas
    - `DATABASE_NAME`: Nombre de la base de datos (ej: `qartha`)
-   - `QRTIGER_API_KEY`: (Opcional) API key para QR Tiger
    - `N8N_WEBHOOK_URL`: (Opcional) Webhook para notificaciones
 3. La aplicación corre automáticamente en **puerto 5000**
 4. URL base: `https://tu-repl.replit.dev`
@@ -193,8 +192,8 @@ POST /api/devices/{device_id}/qr
 {
   "id": "64a7b8c9d0e1f2a3b4c5d6e7",
   "name": "Router Principal",
-  "qr_url": "https://api.qrcode-tiger.com/qr/dynamic/abc123",
-  "qr_image_url": "https://api.qrcode-tiger.com/qr/dynamic/abc123.png",
+  "qr_url": "https://tu-repl.replit.dev/collect/64a7b8c9d0e1f2a3b4c5d6e7",
+  "qr_image_url": "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Ftu-repl.replit.dev%2Fcollect%2F64a7b8c9d0e1f2a3b4c5d6e7",
   // ... resto de campos del dispositivo
 }
 ```
@@ -457,7 +456,23 @@ La API devuelve errores en formato estándar:
 
 ## 📱 Integración QR
 
-Cuando generas un QR para un dispositivo, el código apunta a:
+### ✅ Nueva Integración goQR API
+- **Sin claves API requeridas:** Funciona inmediatamente sin configuración
+- **Alta disponibilidad:** goQR es un servicio gratuito y confiable
+- **QR codes 300x300 PNG:** Óptimo para impresión y pantallas
+
+Cuando generas un QR para un dispositivo (`POST /api/devices/{id}/qr`):
+
+**Respuesta:**
+```json
+{
+  "qr_url": "https://tu-repl.replit.dev/collect/64a7b8c9d0e1f2a3b4c5d6e7",
+  "qr_image_url": "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Ftu-repl.replit.dev%2Fcollect%2F64a7b8c9d0e1f2a3b4c5d6e7"
+}
+```
+
+### Flujo de Escaneo
+El código QR apunta a:
 ```
 https://tu-repl.replit.dev/collect/{device_id}
 ```
@@ -467,6 +482,18 @@ Esta página automáticamente:
 2. Registra el escaneo en `/api/scans`
 3. Envía notificaciones (si está configurado)
 
+### Frontend: Mostrar QR Code
+```javascript
+// Mostrar imagen del QR generado
+const displayQR = (device) => {
+  const img = document.createElement('img');
+  img.src = device.qr_image_url;
+  img.alt = `QR Code for ${device.name}`;
+  img.style.maxWidth = '300px';
+  document.getElementById('qr-container').appendChild(img);
+};
+```
+
 ## 🔧 Características Técnicas
 
 - **Framework:** FastAPI 0.115.2
@@ -474,7 +501,7 @@ Esta página automáticamente:
 - **Servidor:** Uvicorn en puerto 5000
 - **Plantillas:** Jinja2 para páginas de colección
 - **Subida de Archivos:** FastAPI UploadFile (máximo 10MB)
-- **QR Codes:** Integración con QR Tiger API + fallback
+- **QR Codes:** Integración con goQR API gratuita (sin necesidad de claves API)
 - **Autenticación:** Token-based (Bearer) con PBKDF2 hashing
 - **CORS:** Configurado para desarrollo local y producción
 
