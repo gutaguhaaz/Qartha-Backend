@@ -63,14 +63,21 @@ async def register_user(user: UserRegister, db = Depends(get_db)):
 @router.post("/api/auth/login")
 async def login_user(user: UserLogin, db = Depends(get_db)):
     """Authenticate user and return token"""
-    print(f"Login attempt for username: {user.username}")  # Debug
-    user_doc = await db.users.find_one({"username": user.username})
+    print(f"Login attempt for username/email: {user.username}")  # Debug
+    
+    # Try to find user by username OR email
+    user_doc = await db.users.find_one({
+        "$or": [
+            {"username": user.username},
+            {"email": user.username}
+        ]
+    })
     
     if not user_doc:
-        print(f"User not found: {user.username}")  # Debug
+        print(f"User not found with username/email: {user.username}")  # Debug
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    print(f"Found user, verifying password...")  # Debug
+    print(f"Found user: {user_doc['username']}, verifying password...")  # Debug
     password_valid = verify_password(user.password, user_doc["password"])
     print(f"Password verification result: {password_valid}")  # Debug
     
