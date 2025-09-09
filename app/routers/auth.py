@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from datetime import datetime, timedelta
 import hashlib
 import secrets
+from bson import ObjectId
 from ..db import get_db
 
 router = APIRouter()
