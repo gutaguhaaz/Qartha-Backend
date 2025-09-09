@@ -29,10 +29,11 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, hashed: str) -> bool:
     """Verify password against hash"""
     try:
-        salt, hash_hex = hashed.split(':')
+        salt, hash_hex = hashed.split(':', 1)  # Split only on first ':'
         expected_hash = hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 100000)
         return expected_hash.hex() == hash_hex
-    except:
+    except Exception as e:
+        print(f"Password verification error: {e}")  # Debug
         return False
 
 @router.post("/api/auth/register")
@@ -62,8 +63,18 @@ async def register_user(user: UserRegister, db = Depends(get_db)):
 @router.post("/api/auth/login")
 async def login_user(user: UserLogin, db = Depends(get_db)):
     """Authenticate user and return token"""
+    print(f"Login attempt for username: {user.username}")  # Debug
     user_doc = await db.users.find_one({"username": user.username})
-    if not user_doc or not verify_password(user.password, user_doc["password"]):
+    
+    if not user_doc:
+        print(f"User not found: {user.username}")  # Debug
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    print(f"Found user, verifying password...")  # Debug
+    password_valid = verify_password(user.password, user_doc["password"])
+    print(f"Password verification result: {password_valid}")  # Debug
+    
+    if not password_valid:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     # Generate simple token (in production, use JWT)
