@@ -1,6 +1,6 @@
+import os
 from pydantic_settings import BaseSettings
 from typing import List
-import os
 
 
 class Settings(BaseSettings):
@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     QRTIGER_DYNAMIC_PATH: str = os.getenv("QRTIGER_DYNAMIC_PATH", "/qr/static")
     ALLOWED_ORIGINS: List[str] = (os.getenv(
         "ALLOWED_ORIGINS",
-        f"https://{os.getenv('REPLIT_DEV_DOMAIN', 'localhost:5000')},http://localhost:4200,https://66b6d128-c3f9-41c1-b84e-8824c47ee752-00-3f58ar46zjoqf.kirk.replit.dev/"
+        f"https://{os.getenv('REPLIT_DEV_DOMAIN', 'localhost:5000')},http://localhost:4200,https://66b6d128-c3f9-41c1-b84e-8824c47ee752-00-3f58ar46zjoqf.kirk.replit.dev"
     ).split(","))
 
 
